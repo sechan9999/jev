@@ -98,7 +98,12 @@ local_jev/
 
 ```bash
 python3 -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt          # needs a CUDA GPU for SGLang
+
+# Client + app deps (no GPU): covers decide.py, benchmark.py, app.py
+pip install -r requirements.txt
+
+# The SGLang server has its own heavier deps and needs a CUDA GPU:
+pip install -r requirements-server.txt
 
 # Terminal 1: start the model server (keep running)
 ./run_server.sh                           # defaults to Qwen/Qwen2.5-0.5B-Instruct
@@ -122,7 +127,7 @@ needs only a client (`streamlit`, `requests`) — the model runs on a separate
 SGLang server, or not at all in **demo mode**.
 
 ```bash
-pip install -r requirements-streamlit.txt
+pip install -r requirements.txt
 streamlit run app.py
 ```
 
@@ -130,12 +135,32 @@ streamlit run app.py
   plausible distribution so you can try the UI without a GPU. Results are
   clearly marked as mock, not model output.
 - **Live mode** calls a running SGLang server; set the URL and model in the
-  sidebar, or via `JEV_BASE_URL` / `JEV_MODEL`. It can also time the scoring
-  lane against the generation lane.
+  sidebar, or via `JEV_BASE_URL` / `JEV_MODEL` (env vars, or Streamlit
+  secrets on Community Cloud). It can also time the scoring lane against the
+  generation lane.
 
 > Hosting note: Streamlit (or Vercel) serves the UI, but neither provides a
 > GPU. For live mode, run the SGLang server on a GPU host (Modal, RunPod,
 > Replicate, a GPU VM, …) and point the app at it.
+
+#### Deploy to Streamlit Community Cloud
+
+The app deploys as-is; the root `requirements.txt` is GPU-free, so the build
+succeeds and **demo mode works immediately**.
+
+1. Push this repo to GitHub (done: `sechan9999/jev`).
+2. Go to [share.streamlit.io](https://share.streamlit.io) and sign in with GitHub.
+3. **Create app** → repository `sechan9999/jev`, branch `main`, main file
+   path `app.py`. Deploy. You get a `https://<name>.streamlit.app` URL.
+4. For **live mode**, add your SGLang server URL under the app's
+   **Settings → Secrets** (or enter it in the sidebar):
+
+   ```toml
+   JEV_BASE_URL = "https://your-gpu-host.example.com"
+   JEV_MODEL = "Qwen/Qwen2.5-0.5B-Instruct"
+   ```
+
+   The server must be publicly reachable from Community Cloud.
 
 ### Example: `decide.py`
 

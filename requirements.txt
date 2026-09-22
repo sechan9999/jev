@@ -1,7 +1,5 @@
-# Local JEV runtime.
-#
-# sglang[all] pulls in the inference server plus its model/runtime deps and
-# needs a CUDA GPU to serve models. requests is the only thing the client
-# scripts (decide.py, benchmark.py) actually import.
-sglang[all]==0.5.10.post1
-requests==2.32.3
+# Client + app deps (no GPU). This is what Streamlit Community Cloud installs
+# from the repo root, and all decide.py / benchmark.py / app.py need.
+# The SGLang server has its own heavier deps in requirements-server.txt.
+streamlit>=1.36,<2
+requests>=2.31,<3

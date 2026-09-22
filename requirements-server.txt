@@ -1,0 +1,5 @@
+# SGLang inference server deps — needs a CUDA GPU.
+# Install this on the GPU host that runs run_server.sh, not on the machine
+# that runs the Streamlit app or the client scripts.
+sglang[all]==0.5.10.post1
+requests==2.32.3

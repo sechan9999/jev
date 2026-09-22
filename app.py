@@ -24,6 +24,16 @@ import streamlit as st
 # jev/ lives next to this file; sys.path[0] is this dir under `streamlit run`.
 from jev import JevEngine
 
+
+def _default(key: str, fallback: str) -> str:
+    """Config lookup: Streamlit secrets first (Community Cloud), then env."""
+    try:
+        if key in st.secrets:  # raises/empty if no secrets file — that's fine
+            return str(st.secrets[key])
+    except Exception:  # noqa: BLE001
+        pass
+    return os.environ.get(key, fallback)
+
 # --- presets (kept inline so the app is self-contained) -------------------
 PRESETS = {
     "지원 문의 라우팅": {
@@ -139,10 +149,10 @@ with st.sidebar:
     live = mode.startswith("실서버")
     if live:
         base_url = st.text_input(
-            "서버 주소", os.environ.get("JEV_BASE_URL", "http://127.0.0.1:30000")
+            "서버 주소", _default("JEV_BASE_URL", "http://127.0.0.1:30000")
         )
         model = st.text_input(
-            "모델", os.environ.get("JEV_MODEL", "Qwen/Qwen2.5-0.5B-Instruct")
+            "모델", _default("JEV_MODEL", "Qwen/Qwen2.5-0.5B-Instruct")
         )
         compare = st.checkbox("생성 방식과 속도 비교", value=False)
     else:
