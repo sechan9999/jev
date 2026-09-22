@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 400" width="920" height="400" role="img" aria-label="Benchmark bar chart. Latency in milliseconds (lower is better): median jev 38.4 vs llm 210.6; mean jev 41.7 vs llm 233.1; p95 jev 58.9 vs llm 402.7 — scoring is about 5.5x faster at the median. Accuracy: jev 92% vs llm 88%. Illustrative example numbers.">
+  <style>
+    text{font-family:'Segoe UI','Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',sans-serif;}
+    .canvas{fill:#1a1a19;stroke:#2a313c;stroke-width:1;}
+    .title{fill:#ffffff;} .ptitle{fill:#ffffff;font-weight:600;}
+    .sub{fill:#c3c2b7;} .axis{fill:#c3c2b7;} .cat{fill:#ffffff;}
+    .val{fill:#ffffff;} .leg{fill:#ffffff;} .callout{fill:#c3c2b7;}
+    .grid{stroke:#33332f;stroke-width:1;}
+    .axisline{stroke:#4a4a44;stroke-width:1.4;}
+    .bar.jev{fill:#199e70;} .bar.llm{fill:#d95926;}
+    .sw.jev{fill:#199e70;} .sw.llm{fill:#d95926;}
+  </style>
+  <rect class="canvas" x="1" y="1" width="918" height="398" rx="14"/>
+  <text class="ptitle" x="70" y="74" font-size="14">Latency · ms</text>
+  <text class="sub" x="70" y="90" font-size="11">lower is better</text>
+  <text class="ptitle" x="690" y="74" font-size="14">Accuracy · %</text>
+  <text class="sub" x="690" y="90" font-size="11">higher is better</text>
+  <line class="grid" x1="70" y1="350.0" x2="600" y2="350.0"/>
+  <text class="axis" x="63" y="353.5" font-size="10" text-anchor="end">0</text>
+  <line class="grid" x1="70" y1="293.3" x2="600" y2="293.3"/>
+  <text class="axis" x="63" y="296.8" font-size="10" text-anchor="end">100</text>
+  <line class="grid" x1="70" y1="236.7" x2="600" y2="236.7"/>
+  <text class="axis" x="63" y="240.2" font-size="10" text-anchor="end">200</text>
+  <line class="grid" x1="70" y1="180.0" x2="600" y2="180.0"/>
+  <text class="axis" x="63" y="183.5" font-size="10" text-anchor="end">300</text>
+  <line class="grid" x1="70" y1="123.3" x2="600" y2="123.3"/>
+  <text class="axis" x="63" y="126.8" font-size="10" text-anchor="end">400</text>
+  <line class="grid" x1="690" y1="350.0" x2="880" y2="350.0"/>
+  <text class="axis" x="683" y="353.5" font-size="10" text-anchor="end">0</text>
+  <line class="grid" x1="690" y1="222.5" x2="880" y2="222.5"/>
+  <text class="axis" x="683" y="226.0" font-size="10" text-anchor="end">50</text>
+  <line class="grid" x1="690" y1="95.0" x2="880" y2="95.0"/>
+  <text class="axis" x="683" y="98.5" font-size="10" text-anchor="end">100</text>
+  <path class="bar jev" d="M111.3,350.0 L111.3,332.2 Q111.3,328.2 115.3,328.2 L153.3,328.2 Q157.3,328.2 157.3,332.2 L157.3,350.0 Z"/>
+  <text class="val" x="134.3" y="322.2" font-size="11" text-anchor="middle">38.4</text>
+  <path class="bar llm" d="M159.3,350.0 L159.3,234.7 Q159.3,230.7 163.3,230.7 L201.3,230.7 Q205.3,230.7 205.3,234.7 L205.3,350.0 Z"/>
+  <text class="val" x="182.3" y="224.7" font-size="11" text-anchor="middle">210.6</text>
+  <text class="cat" x="158.3" y="368" font-size="12" text-anchor="middle">median</text>
+  <path class="bar jev" d="M288.0,350.0 L288.0,330.4 Q288.0,326.4 292.0,326.4 L330.0,326.4 Q334.0,326.4 334.0,330.4 L334.0,350.0 Z"/>
+  <text class="val" x="311.0" y="320.4" font-size="11" text-anchor="middle">41.7</text>
+  <path class="bar llm" d="M336.0,350.0 L336.0,221.9 Q336.0,217.9 340.0,217.9 L378.0,217.9 Q382.0,217.9 382.0,221.9 L382.0,350.0 Z"/>
+  <text class="val" x="359.0" y="211.9" font-size="11" text-anchor="middle">233.1</text>
+  <text class="cat" x="335.0" y="368" font-size="12" text-anchor="middle">mean</text>
+  <path class="bar jev" d="M464.7,350.0 L464.7,320.6 Q464.7,316.6 468.7,316.6 L506.7,316.6 Q510.7,316.6 510.7,320.6 L510.7,350.0 Z"/>
+  <text class="val" x="487.7" y="310.6" font-size="11" text-anchor="middle">58.9</text>
+  <path class="bar llm" d="M512.7,350.0 L512.7,125.8 Q512.7,121.8 516.7,121.8 L554.7,121.8 Q558.7,121.8 558.7,125.8 L558.7,350.0 Z"/>
+  <text class="val" x="535.7" y="115.8" font-size="11" text-anchor="middle">402.7</text>
+  <text class="cat" x="511.7" y="368" font-size="12" text-anchor="middle">p95</text>
+  <path class="bar jev" d="M708.0,350.0 L708.0,119.4 Q708.0,115.4 712.0,115.4 L758.0,115.4 Q762.0,115.4 762.0,119.4 L762.0,350.0 Z"/>
+  <text class="val" x="735.0" y="109.4" font-size="11" text-anchor="middle">92</text>
+  <text class="cat" x="735.0" y="368" font-size="12" text-anchor="middle">jev</text>
+  <path class="bar llm" d="M808.0,350.0 L808.0,129.6 Q808.0,125.6 812.0,125.6 L858.0,125.6 Q862.0,125.6 862.0,129.6 L862.0,350.0 Z"/>
+  <text class="val" x="835.0" y="119.6" font-size="11" text-anchor="middle">88</text>
+  <text class="cat" x="835.0" y="368" font-size="12" text-anchor="middle">llm</text>
+  <line class="axisline" x1="70" y1="350" x2="600" y2="350"/>
+  <line class="axisline" x1="690" y1="350" x2="880" y2="350"/>
+  <rect class="sw jev" x="600" y="24" width="12" height="12" rx="3"/>
+  <text class="leg" x="618" y="34" font-size="12">jev · scoring</text>
+  <rect class="sw llm" x="710" y="24" width="12" height="12" rx="3"/>
+  <text class="leg" x="728" y="34" font-size="12">llm · generation</text>
+  <text class="title" x="70" y="34" font-size="17" font-weight="600">Scoring vs. generation benchmark</text>
+  <text class="sub" x="70" y="52" font-size="11.5">100 cases/lane · jev ≈5.5× faster at the median · illustrative (varies by GPU / model / precision)</text>
+</svg>

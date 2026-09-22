@@ -152,6 +152,11 @@ llm     100    88.00%        210.6      233.1      402.7
 Scoring is ~5.5x faster than generation at the median.
 ```
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/jev-benchmark-dark.svg">
+  <img alt="Bar chart of the benchmark numbers. Latency in milliseconds, lower is better: median jev 38.4 vs llm 210.6, mean jev 41.7 vs llm 233.1, p95 jev 58.9 vs llm 402.7 — scoring is about 5.5x faster at the median. Accuracy: jev 92% vs llm 88%. Illustrative example figures." src="docs/jev-benchmark-light.svg" width="840">
+</picture>
+
 (Exact numbers depend on GPU, model, and precision.) Scoring is faster
 because it never enters the decode loop, and it can't emit an unparseable
 answer — a failure mode that counts against the generation lane.
