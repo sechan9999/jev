@@ -17,7 +17,9 @@ from __future__ import annotations
 import math
 import os
 import re
+import statistics
 import time
+from collections import defaultdict
 
 import streamlit as st
 
@@ -82,6 +84,52 @@ PRESETS = {
         "examples": [""],
     },
 }
+
+# --- labeled cases for the accuracy check (reuse the preset answer sets) ---
+_SUPPORT = PRESETS["지원 문의 라우팅"]["answers"]
+_SCREEN = PRESETS["지원자 선별"]["answers"]
+_EXPENSE = PRESETS["경비 검토"]["answers"]
+
+
+def _cases(domain: str, answers: dict, pairs: list[tuple[str, str]]) -> list[dict]:
+    return [{"domain": domain, "answers": answers, "query": q, "label": lbl}
+            for q, lbl in pairs]
+
+
+EVAL_CASES = (
+    _cases("지원 문의", _SUPPORT, [
+        ("같은 구독료가 두 번 청구됐어요.", "billing"),
+        ("카드에 중복 결제된 금액을 환불해 주세요.", "billing"),
+        ("취소했는데도 요금이 청구됐어요.", "billing"),
+        ("파일을 올릴 때마다 앱이 계속 꺼져요.", "technical"),
+        ("대시보드를 열면 500 오류가 납니다.", "technical"),
+        ("내보내기 버튼을 눌러도 아무 반응이 없어요.", "technical"),
+        ("비밀번호를 바꿔도 로그인이 안 돼요.", "account"),
+        ("문자로 오는 인증 코드가 오지 않아요.", "account"),
+        ("계정 이메일 주소를 바꾸고 싶어요.", "account"),
+        ("명절 선물용 상품권도 파나요?", "other"),
+    ])
+    + _cases("지원자 선별", _SCREEN, [
+        ("역할: 시니어 파이썬(5년+). 지원자: 파이썬 8년, 백엔드 팀 리드.", "advance"),
+        ("역할: 프런트엔드(React). 지원자: React 6년, 대형 앱 3개 출시.", "advance"),
+        ("역할: iOS 개발. 지원자: Swift 4년, 사용자 100만 앱 출시.", "advance"),
+        ("역할: 시니어 파이썬(5년+). 지원자: 파이썬 1년, 부트캠프 수료.", "reject"),
+        ("역할: 데브옵스(쿠버네티스). 지원자: 윈도우 데스크톱 지원 경력만 있음.", "reject"),
+        ("역할: 데이터 과학자, 운영 ML. 지원자: ML 연구 강점, 운영 경험 없음.", "review"),
+        ("역할: 제품 분석가(SQL). 지원자: SQL 강함, 도메인 적합성 불명확.", "review"),
+        ("역할: 보안 엔지니어. 지원자: 이름 외에 이력서가 비어 있음.", "other"),
+    ])
+    + _cases("경비 검토", _EXPENSE, [
+        ("공항에서 호텔까지 택시 12,000원, 영수증 첨부.", "approve"),
+        ("팀 점심 4명 45,000원, 영수증 첨부.", "approve"),
+        ("주차비 9,000원, 영수증 있음.", "approve"),
+        ("사전 승인 없는 450만원 일등석 항공권.", "flag"),
+        ("하루 숙박 호텔 30만원, 도시 상한은 25만원.", "flag"),
+        ("영수증과 설명이 없는 '기타' 200만원.", "flag"),
+        ("회사 카드로 결제한 30만원 개인 스파.", "deny"),
+        ("업무 참석자 없는 주류만 6만원.", "deny"),
+    ])
+)
 
 
 # --- mock scoring (demo mode only) ----------------------------------------
@@ -234,6 +282,68 @@ if st.button("결정하기", type="primary", use_container_width=True):
             st.error(f"요청 실패: {exc}")
             if live:
                 st.caption("서버 주소와 SGLang 실행 여부를 확인하세요.")
+
+st.divider()
+st.header("정확도 점검")
+st.caption(
+    "라벨된 예시를 한 번에 돌려 점수 방식의 정확도와 속도를 봅니다. "
+    "정확도는 모델 크기에 좌우됩니다(작은 모델일수록 낮음)."
+)
+n_eval = st.slider("평가할 예시 수", 5, len(EVAL_CASES), len(EVAL_CASES))
+
+if st.button("정확도 평가 실행", use_container_width=True):
+    cases = EVAL_CASES[:n_eval]
+    engine = JevEngine(model=model, base_url=base_url) if live else None
+    prog = st.progress(0.0, text="평가 중...")
+    rows, latencies = [], []
+    dom_total, dom_ok = defaultdict(int), defaultdict(int)
+    correct = 0
+    try:
+        for i, c in enumerate(cases):
+            if live:
+                r = engine.decide(c["query"], c["answers"])
+                choice, ms = r.choice, r.latency_ms
+            else:
+                t0 = time.perf_counter()
+                choice = mock_decide(c["query"], c["answers"])["choice"]
+                ms = (time.perf_counter() - t0) * 1000.0
+            ok = choice == c["label"]
+            correct += ok
+            latencies.append(ms)
+            dom_total[c["domain"]] += 1
+            dom_ok[c["domain"]] += int(ok)
+            rows.append({
+                "도메인": c["domain"],
+                "입력": c["query"][:26],
+                "정답": c["label"],
+                "예측": choice,
+                "맞음": "O" if ok else "X",
+                "ms": round(ms, 1),
+            })
+            prog.progress((i + 1) / len(cases), text=f"평가 중... {i + 1}/{len(cases)}")
+    except Exception as exc:  # noqa: BLE001 -- surface server/parse errors in the UI
+        prog.empty()
+        st.error(f"평가 실패: {exc}")
+        if live:
+            st.caption("서버 주소와 SGLang 실행 여부를 확인하세요.")
+    else:
+        prog.empty()
+        m1, m2, m3 = st.columns(3)
+        m1.metric("정확도", f"{correct / len(cases):.0%}", f"{correct}/{len(cases)}")
+        m2.metric("평균 지연", f"{statistics.mean(latencies):.1f} ms")
+        m3.metric("중앙값 지연", f"{statistics.median(latencies):.1f} ms")
+
+        st.caption("도메인별 정확도")
+        render_distribution({d: dom_ok[d] / dom_total[d] for d in dom_total})
+
+        with st.expander("케이스별 결과 보기"):
+            st.dataframe(rows, use_container_width=True, hide_index=True)
+
+        if not live:
+            st.caption(
+                "데모 모드: 예측이 키워드 기반 모의값이라 정확도가 낮습니다. "
+                "실서버 모드에서 실제 정확도를 확인하세요."
+            )
 
 st.divider()
 st.caption(

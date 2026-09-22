@@ -176,6 +176,10 @@ streamlit run app.py
   sidebar, or via `JEV_BASE_URL` / `JEV_MODEL` (env vars, or Streamlit
   secrets on Community Cloud). It can also time the scoring lane against the
   generation lane.
+- **Accuracy check** runs a built-in labeled set (support / screening /
+  expense) through the scoring lane and reports overall and per-domain
+  accuracy plus latency — the in-app version of `benchmark.py`. Accuracy
+  tracks model size, so a larger model scores higher.
 
 > Hosting note: Streamlit (or Vercel) serves the UI, but neither provides a
 > GPU. For live mode, run the SGLang server on a GPU host (Modal, RunPod,
