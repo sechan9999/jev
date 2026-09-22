@@ -115,6 +115,16 @@ python decide.py
 python benchmark.py --n 100
 ```
 
+**Windows:** run the server inside WSL2 (Ubuntu) with an NVIDIA GPU — SGLang
+is not supported on native Windows. Extra flags pass through `run_server.sh`.
+If the launch fails with `libnuma.so.1: cannot open shared object file`, run
+`sudo apt install -y libnuma1`. If it fails with `Could not find nvcc` during
+CUDA-graph capture (no CUDA toolkit installed), disable graph capture:
+
+```bash
+bash run_server.sh --disable-cuda-graph --mem-fraction-static 0.7
+```
+
 Pick a different model with `MODEL=Qwen/Qwen3-4B-Instruct-2507 ./run_server.sh`
 and `JEV_MODEL=Qwen/Qwen3-4B-Instruct-2507 python decide.py`. Any open model
 whose labels tokenize to single tokens works (Qwen 2.5 / 3, DeepSeek-R1-Distill,
