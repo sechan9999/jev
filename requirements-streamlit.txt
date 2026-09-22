@@ -1,0 +1,5 @@
+# Client-only deps for the Streamlit demo (app.py).
+# No GPU / SGLang needed here: the UI calls a separate inference server, or
+# runs in demo mode with no server at all.
+streamlit>=1.36,<2
+requests>=2.31,<3

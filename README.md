@@ -115,6 +115,28 @@ and `JEV_MODEL=Qwen/Qwen3-4B-Instruct-2507 python decide.py`. Any open model
 whose labels tokenize to single tokens works (Qwen 2.5 / 3, DeepSeek-R1-Distill,
 SmolLM2, TinyLlama, …).
 
+### Browser demo (Streamlit)
+
+`app.py` is a small UI for making decisions and comparing the two lanes. It
+needs only a client (`streamlit`, `requests`) — the model runs on a separate
+SGLang server, or not at all in **demo mode**.
+
+```bash
+pip install -r requirements-streamlit.txt
+streamlit run app.py
+```
+
+- **Demo mode** (default) needs no server: a keyword heuristic fills in a
+  plausible distribution so you can try the UI without a GPU. Results are
+  clearly marked as mock, not model output.
+- **Live mode** calls a running SGLang server; set the URL and model in the
+  sidebar, or via `JEV_BASE_URL` / `JEV_MODEL`. It can also time the scoring
+  lane against the generation lane.
+
+> Hosting note: Streamlit (or Vercel) serves the UI, but neither provides a
+> GPU. For live mode, run the SGLang server on a GPU host (Modal, RunPod,
+> Replicate, a GPU VM, …) and point the app at it.
+
 ### Example: `decide.py`
 
 ```json
