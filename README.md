@@ -159,13 +159,7 @@ Scoring is ~5.5x faster than generation at the median.
 
 (Exact numbers depend on GPU, model, and precision.) Scoring is faster
 because it never enters the decode loop, and it can't emit an unparseable
-answer — a failure mode that counts against the generation lane.
-
-The gap above comes straight from the two paths: the `llm` lane pays for the
-token-generation loop plus a parse, while the `jev` lane runs the model once
-and reads the logits.
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/jev-compare-dark.svg">
-  <img alt="Same input and same decision, two paths. The generation lane runs the model, loops token-by-token to write text like {\"team\": \"billing\"}, then parses it. The scoring lane runs the model once, reads the A/B/C logits, applies softmax over only those three values, and returns a probability distribution (0.91 / 0.06 / 0.03)." src="docs/jev-compare-light.svg" width="840">
-</picture>
+answer — a failure mode that counts against the generation lane. The gap
+comes straight from the two paths ([diagram above](#scoring-vs-generation-side-by-side)):
+the `llm` lane pays for the token-generation loop plus a parse, while the
+`jev` lane runs the model once and reads the logits.
