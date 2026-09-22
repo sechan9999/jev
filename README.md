@@ -119,11 +119,26 @@ python benchmark.py --n 100
 is not supported on native Windows. Extra flags pass through `run_server.sh`.
 If the launch fails with `libnuma.so.1: cannot open shared object file`, run
 `sudo apt install -y libnuma1`. If it fails with `Could not find nvcc` during
-CUDA-graph capture (no CUDA toolkit installed), disable graph capture:
+CUDA-graph capture (no CUDA toolkit installed), disable graph capture — both
+the regular and the piecewise graph:
 
 ```bash
-bash run_server.sh --disable-cuda-graph --mem-fraction-static 0.7
+bash run_server.sh --disable-cuda-graph --disable-piecewise-cuda-graph --mem-fraction-static 0.7
 ```
+
+(Installing the CUDA toolkit so `nvcc` exists is the alternative, and keeps
+graph capture on for best performance — but it is a much heavier setup.)
+
+If the Streamlit app runs on **Windows** while the server runs in **WSL**,
+bind the server to all interfaces so WSL2 forwards it to Windows `localhost`:
+
+```bash
+HOST=0.0.0.0 bash run_server.sh --disable-cuda-graph --disable-piecewise-cuda-graph --mem-fraction-static 0.7
+```
+
+The app then reaches it at `http://127.0.0.1:30000` as usual. (Simplest
+alternative: run `streamlit run app.py` inside WSL too, so both sides share
+the same `127.0.0.1`.)
 
 Pick a different model with `MODEL=Qwen/Qwen3-4B-Instruct-2507 ./run_server.sh`
 and `JEV_MODEL=Qwen/Qwen3-4B-Instruct-2507 python decide.py`. Any open model
