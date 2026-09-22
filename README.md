@@ -18,6 +18,19 @@ This reproduces the **Jev inference pattern** locally using
 [SGLang](https://github.com/sgl-project/sglang)'s `/v1/score` endpoint. It
 recreates the *inference path* only — not Jev's training/calibration work.
 
+## Scoring vs. generation, side by side
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/jev-compare-dark.svg">
+  <img alt="Same input and same decision, two paths. The generation lane runs the model, loops token-by-token to write text like {\"team\": \"billing\"}, then parses it. The scoring lane runs the model once, reads the A/B/C logits, applies softmax over only those three values, and returns a probability distribution (0.91 / 0.06 / 0.03)." src="docs/jev-compare-light.svg" width="840">
+</picture>
+
+Same input (left) and same decision (right) — only the middle differs. The
+generation lane loops token-by-token and then parses free text; the scoring
+lane runs the model **once**, reads the logits for `A`/`B`/`C`, and normalizes
+just those three. The token-generation loop is the slow part the scoring path
+never enters.
+
 ## Why scoring, not generation
 
 | | What the server does | What you get back |
