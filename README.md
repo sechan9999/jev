@@ -117,17 +117,30 @@ python benchmark.py --n 100
 
 **Windows:** run the server inside WSL2 (Ubuntu) with an NVIDIA GPU — SGLang
 is not supported on native Windows. Extra flags pass through `run_server.sh`.
-If the launch fails with `libnuma.so.1: cannot open shared object file`, run
-`sudo apt install -y libnuma1`. If it fails with `Could not find nvcc` during
-CUDA-graph capture (no CUDA toolkit installed), disable graph capture — both
-the regular and the piecewise graph:
 
-```bash
-bash run_server.sh --disable-cuda-graph --disable-piecewise-cuda-graph --mem-fraction-static 0.7
-```
+Without the CUDA toolkit, SGLang can't JIT-compile kernels, so disable every
+feature that needs `nvcc`. Two fixes:
 
-(Installing the CUDA toolkit so `nvcc` exists is the alternative, and keeps
-graph capture on for best performance — but it is a much heavier setup.)
+- **No install (quick):** disable graph capture and the overlap scheduler, and
+  install the runtime lib SGLang needs (`libnuma`):
+
+  ```bash
+  sudo apt install -y libnuma1
+  bash run_server.sh --disable-cuda-graph --disable-piecewise-cuda-graph \
+                     --disable-overlap-schedule --mem-fraction-static 0.7
+  ```
+
+  (If `--disable-overlap-schedule` is rejected, the flag is `--disable-overlap-scheduler`.)
+
+- **Install once (definitive):** `sudo apt install -y nvidia-cuda-toolkit`, then
+  run `bash run_server.sh` with no disable flags — graph capture stays on and
+  it's faster. This downloads several GB.
+
+Common launch errors and the flag that fixes each: `libnuma.so.1: cannot open
+shared object file` → `apt install libnuma1`; `Could not find nvcc` during
+graph capture → `--disable-cuda-graph --disable-piecewise-cuda-graph`;
+`Could not find CUDA installation / CUDA_HOME` on the first request →
+`--disable-overlap-schedule`.
 
 If the Streamlit app runs on **Windows** while the server runs in **WSL**,
 bind the server to all interfaces so WSL2 forwards it to Windows `localhost`:
